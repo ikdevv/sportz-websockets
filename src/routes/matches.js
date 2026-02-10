@@ -48,6 +48,11 @@ matchesRouter.post("/", async (req, res) => {
         }).returning();
 
         res.status(201).json({ message: "Match created successfully", data: event });
+
+        // Broadcast the new match to WebSocket clients
+        if(res.app.locals.broadcastMatchCreated) {
+            res.app.locals.broadcastMatchCreated(event);
+        }
         
     } catch (e) {
         console.error("Failed to create match:", e);
