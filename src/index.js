@@ -1,10 +1,11 @@
-import express from 'express';
-import { matchesRouter } from './routes/matches.js';
-import http from 'http';
-import { attachWebSocketServer } from './ws/server.js';
+import express from "express";
+import { matchesRouter } from "./routes/matches.js";
+import http from "http";
+import { attachWebSocketServer } from "./ws/server.js";
+import { securityMiddleware } from "./arcjet.js";
 
 const PORT = Number(process.env.PORT) || 8000;
-const HOST = process.env.HOST || '0.0.0.0';
+const HOST = process.env.HOST || "0.0.0.0";
 
 const app = express();
 // Create an HTTP server instance using the app
@@ -14,12 +15,14 @@ const server = http.createServer(app);
 app.use(express.json());
 
 // Define a root GET route that returns a welcome message
-app.get('/', (req, res) => {
-  res.send('Welcome to the Sportz server!');
+app.get("/", (req, res) => {
+  res.send("Welcome to the Sportz server!");
 });
 
+app.use(securityMiddleware()); // Apply security middleware to all routes
+
 // Use the matches router for all routes starting with '/matches'
-app.use('/matches', matchesRouter);
+app.use("/matches", matchesRouter);
 
 // Attach the WebSocket server to the HTTP server and extract the broadcast function
 const { broadcastMatchCreated } = attachWebSocketServer(server);
@@ -28,7 +31,8 @@ const { broadcastMatchCreated } = attachWebSocketServer(server);
 app.locals.broadcastMatchCreated = broadcastMatchCreated;
 
 server.listen(PORT, HOST, () => {
-  const baseUrl = HOST === '0.0.0.0' ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;
+  const baseUrl =
+    HOST === "0.0.0.0" ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;
   console.log(`Server is running at ${baseUrl}`);
-  console.log(`Websocket is running on ${baseUrl.replace('http', 'ws')}/ws`)
+  console.log(`Websocket is running on ${baseUrl.replace("http", "ws")}/ws`);
 });
