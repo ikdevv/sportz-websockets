@@ -14,12 +14,13 @@ const server = http.createServer(app);
 // Use JSON middleware to parse incoming JSON requests
 app.use(express.json());
 
+// Apply security middleware to all routes
+app.use(securityMiddleware());
+
 // Define a root GET route that returns a welcome message
 app.get("/", (req, res) => {
   res.send("Welcome to the Sportz server!");
 });
-
-app.use(securityMiddleware()); // Apply security middleware to all routes
 
 // Use the matches router for all routes starting with '/matches'
 app.use("/matches", matchesRouter);
