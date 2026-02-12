@@ -3,6 +3,7 @@ import { matchesRouter } from "./routes/matches.js";
 import http from "http";
 import { attachWebSocketServer } from "./ws/server.js";
 import { securityMiddleware } from "./arcjet.js";
+import { commentaryRouter } from "./routes/commentary.js";
 
 const PORT = Number(process.env.PORT) || 8000;
 const HOST = process.env.HOST || "0.0.0.0";
@@ -15,7 +16,7 @@ const server = http.createServer(app);
 app.use(express.json());
 
 // Apply security middleware to all routes
-app.use(securityMiddleware());
+// app.use(securityMiddleware());
 
 // Define a root GET route that returns a welcome message
 app.get("/", (req, res) => {
@@ -24,9 +25,13 @@ app.get("/", (req, res) => {
 
 // Use the matches router for all routes starting with '/matches'
 app.use("/matches", matchesRouter);
+app.use("/matches/:id/commentary", commentaryRouter);
 
 // Attach the WebSocket server to the HTTP server and extract the broadcast function
-const { broadcastMatchCreated } = attachWebSocketServer(server);
+const { broadcastMatchCreated, broadcastCommentary } =
+  attachWebSocketServer(server);
+app.locals.broadcastMatchCreated = broadcastMatchCreated;
+app.locals.broadcastCommentary = broadcastCommentary;
 
 // Store the broadcast function in app.locals for use in route handlers
 app.locals.broadcastMatchCreated = broadcastMatchCreated;
