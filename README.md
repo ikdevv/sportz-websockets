@@ -184,9 +184,6 @@ app.locals.broadcastCommentary = broadcastCommentary;
 
 Create issues or PRs. Keep changes focused and add tests where appropriate.
 
----
+## References
 
-If you want, I can add:
-
-- example Postman collection for the HTTP and WebSocket flows ✅
-- basic test that asserts broadcasting works (spins up a temporary WS client) ✅
+- JavaScript Mastery: https://www.youtube.com/watch?v=I1V9YWqRIeI&t=11280s
