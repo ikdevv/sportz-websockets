@@ -1,4 +1,5 @@
 import { WebSocket, WebSocketServer } from "ws";
+import { URL } from "url";
 import { wsArcjet } from "../arcjet.js";
 
 const matchSubscribers = new Map();
@@ -90,6 +91,12 @@ export function attachWebSocketServer(server) {
     const { pathname } = new URL(req.url, `http://${req.headers.host}`);
 
     if (pathname !== "/ws") {
+      // Respond with a 400 Bad Request and close the socket for non-/ws upgrades
+      try {
+        socket.write("HTTP/1.1 400 Bad Request\r\n\r\n");
+      } finally {
+        socket.destroy();
+      }
       return;
     }
 
@@ -119,7 +126,7 @@ export function attachWebSocketServer(server) {
     });
   });
 
-  wss.on("connection", async (socket, req) => {
+  wss.on("connection", async (socket) => {
     socket.isAlive = true;
     socket.on("pong", () => {
       socket.isAlive = true;
